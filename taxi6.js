@@ -51,7 +51,7 @@ async function captchaResolver(page) {
             if (btn2) {
                 await btn2.click()
             }
-            await sleep(300);
+            await sleep(500);
             let wrongCaptcha = await page.$('div.ReactModal__Content');
             if (wrongCaptcha) {
                 console.log('wrong captcha!');
@@ -77,7 +77,7 @@ async function signin(browser) {
     await page.waitForSelector('.flex.flex-col.space-y-3 .text-center p.text-lg.font-semibold');
     await timeUntilNextHour();
     await page.goto('https://bus-med.1337.ma/api/auth/42');
-    await sleep(300);
+    await sleep(500);
     return page;
 }
 
