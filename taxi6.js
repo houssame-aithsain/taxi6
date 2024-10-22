@@ -17,8 +17,8 @@ async function timeUntilNextHour() {
         (currentSeconds * 1000) -            
         currentMilliseconds;                 
 
-    console.log('time in MS until next hour', (millisecondsUntilNextHour - 15000));
-    await sleep((millisecondsUntilNextHour - 15000));
+    console.log('time in MS until next hour', (millisecondsUntilNextHour - 5000));
+    await sleep((millisecondsUntilNextHour - 5000));
 }
 
 
