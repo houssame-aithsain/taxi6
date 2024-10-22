@@ -71,7 +71,7 @@ async function captchaResolver(page) {
 async function signin(browser) {
     const page = await browser.newPage();
     await page.goto('https://bus-med.1337.ma/api/auth/42');
-    await page.type('#username', process.env.USER);
+    await page.type('#username', 'hait-hsa');
     await page.type('#password', process.env.PASSWORD);
     await page.click('#kc-login');
     await page.waitForSelector('.flex.flex-col.space-y-3 .text-center p.text-lg.font-semibold');
@@ -87,13 +87,14 @@ async function sleep(ms) {
 
 (async () => {
     const browser = await puppeteer.launch({
-        executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         headless: process.env.BROWSER_MODE === 'headless'
     });
 
     const page = await signin(browser);
     const buses = await page.$$('.bg-white.rounded-xl.shadow-lg');
     for (let bus of buses) {
+        sleep(300);
         const destination = await bus.$eval('.flex.items-center.justify-between .text-center:last-child', el => el.innerText);
     
         console.log('|' + destination.replace(/^TO\n\n/, '') + '|');
