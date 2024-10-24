@@ -87,7 +87,7 @@ async function sleep(ms) {
 
 (async () => {
     const browser = await puppeteer.launch({
-        // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         headless: process.env.BROWSER_MODE === 'headless'
     });
 
