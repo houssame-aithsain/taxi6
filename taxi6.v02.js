@@ -115,5 +115,5 @@ async function sleep(ms) {
             break;
         }
     }
-    // await browser.close();
+    await browser.close();
 })();
