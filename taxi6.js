@@ -110,7 +110,7 @@ async function sleep(ms) {
             await page.waitForSelector(buttonSelector);
             await page.click(buttonSelector);
             await page.click('.w-full.relative.flex.flex-col.gap-1.p-1:first-child');
-            let time = new Date();
+            // let time = new Date();
             await captchaResolver(page);
             // console.log(time.getMilliseconds() - new Date().getMilliseconds());
             break;
