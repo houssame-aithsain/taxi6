@@ -18,7 +18,9 @@ async function timeUntilNextHour() {
         currentMilliseconds;                 
 
     console.log('time in MS until next hour', (millisecondsUntilNextHour - 200));
-    await sleep((millisecondsUntilNextHour - 200));
+    if (millisecondsUntilNextHour - 200 > 0) {
+        await sleep((millisecondsUntilNextHour - 200));
+    }
 }
 
 
@@ -27,57 +29,56 @@ async function captchaResolver(page) {
         const svg = document.querySelector('.ReactModalPortal .flex.flex-col.items-center svg');
         return svg ? new XMLSerializer().serializeToString(svg) : null;
     });
-    //parser:
-    const cleanedSvgString = svgString.replace(/<path[^>]*d="[^"]*"[^>]*fill="none"[^>]*\/?>/g, '');
-    // end parser
-    if (cleanedSvgString) {
+    
+    if (svgString) {
+        const cleanedSvgString = svgString.replace(/<path[^>]*d="[^"]*"[^>]*fill="none"[^>]*\/?>/g, '');
         const imageBuffer = await sharp(Buffer.from(cleanedSvgString))
             .png()
             .toBuffer();
         
-        // await sharp(imageBuffer).toFile('output.png');
-        // console.log('Image saved as output.png');
-        
-        let text = await Tesseract.recognize(imageBuffer, 'eng', {
-        }).then(({ data: { text } }) => {
+        let text = await Tesseract.recognize(imageBuffer, 'eng', {}).then(({ data: { text } }) => {
             return text;
         }).catch(console.error);
-        let btn = await page.$('input[placeholder="Enter captcha"]');
-        if (btn) {
-            text = text.replace(' ', '');
-            console.log('text: |' + text + '|');
+
+        try {
+            await page.waitForSelector('input[placeholder="Enter captcha"]', { timeout: 10000 });
+            text = text.replace(/ +/g, '') + '\n';
+            console.log('captcha:', text);
             await page.type('input[placeholder="Enter captcha"]', text);
-            let btn2 = await page.$('.flex.gap-4.justify-center.mt-4');
-            if (btn2) {
-                await btn2.click()
-            }
-            await sleep(500);
-            let wrongCaptcha = await page.$('div.ReactModal__Content');
-            if (wrongCaptcha) {
+            
+            const submitButtonSelector = '.flex.gap-4.justify-center.mt-4';
+            await page.waitForSelector(submitButtonSelector, { timeout: 10000 });
+            await page.click(submitButtonSelector);
+
+            const wrongCaptchaSelector = 'div.ReactModal__Content';
+            const isWrongCaptcha = await page.waitForSelector(wrongCaptchaSelector, { timeout: 5000 }).catch(() => null);
+            if (isWrongCaptcha) {
                 console.log('wrong captcha!');
-                await page.click('input[placeholder="Enter captcha"]', {clickCount: 3});
-                await page.keyboard.press('Backspace')
+                await page.click('input[placeholder="Enter captcha"]', { clickCount: 3 });
+                await page.keyboard.press('Backspace');
                 await captchaResolver(page);
             } else {
                 console.log('reserved');
                 return;
             }
+        } catch (error) {
+            console.log('-------->reserved<--------');
         }
     } else {
         console.error('SVG not found on the page.');
     }
 }
 
+
 async function signin(browser) {
     const page = await browser.newPage();
     await page.goto('https://bus-med.1337.ma/api/auth/42');
-    await page.type('#username', 'hait-hsa');
+    await page.type('#username', process.env.USERNAME);
     await page.type('#password', process.env.PASSWORD);
     await page.click('#kc-login');
     await page.waitForSelector('.flex.flex-col.space-y-3 .text-center p.text-lg.font-semibold');
     await timeUntilNextHour();
-    await page.goto('https://bus-med.1337.ma/api/auth/42');
-    await sleep(500);
+    await page.reload({ waitUntil: 'networkidle0' });
     return page;
 }
 
@@ -92,11 +93,13 @@ async function sleep(ms) {
     });
 
     const page = await signin(browser);
+    const Allbuses = '.bg-white.rounded-xl.shadow-lg';
+    await page.waitForSelector(Allbuses, { timeout: 5000 });
     const buses = await page.$$('.bg-white.rounded-xl.shadow-lg');
     for (let bus of buses) {
-        sleep(300);
+        await bus.waitForSelector('.flex.items-center.justify-between .text-center:last-child', { timeout: 5000 });
+
         const destination = await bus.$eval('.flex.items-center.justify-between .text-center:last-child', el => el.innerText);
-    
         console.log('|' + destination.replace(/^TO\n\n/, '') + '|');
     
         if (destination.replace(/^TO\n\n/, '') === 'MARTIL') {
@@ -113,5 +116,5 @@ async function sleep(ms) {
             break;
         }
     }
-    await browser.close();
+    // await browser.close();
 })();
