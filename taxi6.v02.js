@@ -76,7 +76,6 @@ async function signin(browser) {
     await page.type('#username', process.env.USERNAME);
     await page.type('#password', process.env.PASSWORD);
     await page.click('#kc-login');
-    await page.waitForSelector('.flex.flex-col.space-y-3 .text-center p.text-lg.font-semibold');
     await timeUntilNextHour();
     await page.reload({ waitUntil: 'networkidle0' });
     return page;
