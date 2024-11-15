@@ -17,9 +17,9 @@ async function timeUntilNextHour() {
         (currentSeconds * 1000) -            
         currentMilliseconds;                 
 
-    console.log('time in MS until next hour', (millisecondsUntilNextHour - 200));
+    console.log('time in MS until next hour', (millisecondsUntilNextHour));
     if (millisecondsUntilNextHour - 200 > 0) {
-        await sleep(200);
+        await sleep(millisecondsUntilNextHour - 200);
     }
 }
 
@@ -66,9 +66,9 @@ async function sleep(ms) {
                 const button = document.querySelector('form button[type="submit"]');
                 button.click();
             });
-            console.log('----------SEAT HAS BEEN BOOKED :)----------');
+            console.log('----------YOUR SEAT HAS BEEN BOOKED :)----------');
             break;
         }
     }
-    // await browser.close();
+    await browser.close();
 })();
