@@ -65,6 +65,7 @@ async function sleep(ms) {
             await page.evaluate(() => {
                 const button = document.querySelector('form button[type="submit"]');
                 button.click();
+                console.log('seat has been booked :)');
             });
             break;
         }
