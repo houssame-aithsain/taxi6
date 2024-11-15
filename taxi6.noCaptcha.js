@@ -64,13 +64,8 @@ async function sleep(ms) {
             await page.click('.w-full.relative.flex.flex-col.gap-1.p-1:first-child');
             await page.evaluate(() => {
                 const button = document.querySelector('form button[type="submit"]');
-                if (button) {
-                  button.click();
-                  console.log('Button clicked programmatically');
-                } else {
-                  console.log('Button not found in evaluation');
-                }
-              });
+                button.click();
+            });
             break;
         }
     }
